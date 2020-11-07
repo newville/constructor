@@ -49,8 +49,8 @@ def modify_xml(xml_path, info):
                                                   'No license'))
     root.append(license)
 
-    background = ET.Element('background',
-                            file=join(OSX_DIR, 'MacInstaller.png'),
+    bkg_image = os.path.abspath(info.get('osxpkg_image', join(OSX_DIR, 'MacInstaller.png')))
+    background = ET.Element('background', file=bkg_image,
                             scaling='proportional', alignment='center')
     root.append(background)
 
@@ -58,10 +58,12 @@ def modify_xml(xml_path, info):
                             attrib={'mime-type': 'richtext/rtf'})
     root.append(conclusion)
 
-    readme_path = join(PACKAGES_DIR, "readme.rtf")
-    write_readme(readme_path, info)
-    readme = ET.Element('readme', file=readme_path,
-                        attrib={'mime-type': 'richtext/rtf'})
+    readme_path = info.get('osxpkg_readme', None)
+    if readme_path is None:
+        readme_path = join(PACKAGES_DIR, "readme.rtf")
+         write_readme(readme_path, info)
+    readme = ET.Element('readme', file=os.path.abspath(readme_path),
+                        attrib={'mime-type': 'richtext/rtf'})    
     root.append(readme)
 
     # See below for an explanation of the consequences of this
